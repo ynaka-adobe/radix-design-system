@@ -11,7 +11,7 @@ async function api(token, path, options = {}) {
     cache: 'no-store',
     headers: { Authorization: `Bearer ${token}`, Accept: 'application/vnd.github+json', 'Content-Type': 'application/json' },
   });
-  const body = await r.json().catch(() => ({}));
+  const body = r.status === 204 ? {} : await r.json().catch(() => ({}));
   if (!r.ok) throw new Error(`${r.status} ${body.message || r.statusText}`);
   return body;
 }
@@ -43,5 +43,32 @@ export async function saveDraft({ token, branch, message, files, base = 'main' }
   const commit = await api(token, 'git/commits', { method: 'POST', body: JSON.stringify({ message, tree: tree.sha, parents: [parent] }) });
   if (updated) await api(token, `git/refs/heads/${branch}`, { method: 'PATCH', body: JSON.stringify({ sha: commit.sha }) });
   else await api(token, 'git/refs', { method: 'POST', body: JSON.stringify({ ref: `refs/heads/${branch}`, sha: commit.sha }) });
-  return { branch, updated, compareUrl: `https://github.com/${REPO}/compare/${base}...${branch}?expand=1` };
+  return { branch, updated, sha: commit.sha, compareUrl: `https://github.com/${REPO}/compare/${base}...${branch}?expand=1` };
+}
+
+const owner = REPO.split('/')[0];
+
+/** Open a pull request for the draft, or return the one that is already open. */
+export async function ensurePullRequest({ token, branch, title, body, base = 'main' }) {
+  const open = await api(token, `pulls?head=${owner}:${encodeURIComponent(branch)}&state=open`);
+  if (open.length) return { number: open[0].number, url: open[0].html_url };
+  const pr = await api(token, 'pulls', { method: 'POST', body: JSON.stringify({ title, body, head: branch, base }) });
+  return { number: pr.number, url: pr.html_url };
+}
+
+/** A commit is addressable by its hash as soon as it exists. Wait until the raw files can be read. */
+export async function waitForCommit(sha, tries = 20) {
+  for (let i = 0; i < tries; i += 1) {
+    try {
+      const r = await fetch(`https://raw.githubusercontent.com/${REPO}/${sha}/public/manifest.json?t=${Date.now()}`, { cache: 'no-store' });
+      if (r.ok) return;
+    } catch (e) { /* retry */ }
+    await new Promise((res) => { setTimeout(res, 1500); });
+  }
+  throw new Error('The preview is not ready yet. Try Generate preview again in a moment.');
+}
+
+export async function mergePullRequest({ token, number, branch }) {
+  await api(token, `pulls/${number}/merge`, { method: 'PUT', body: JSON.stringify({ merge_method: 'squash' }) });
+  try { await api(token, `git/refs/heads/${branch}`, { method: 'DELETE' }); } catch (e) { /* the branch can stay */ }
 }

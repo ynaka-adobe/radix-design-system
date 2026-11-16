@@ -81,7 +81,7 @@ export default function App() {
           <Tabs.Content value="primitives"><BlocksPanel {...shared} tier="collection" editable /></Tabs.Content>
           <Tabs.Content value="components"><BlocksPanel {...shared} tier="core" editable={false} /></Tabs.Content>
         </Tabs.Root>
-        <ApplyBar files={files} impact={impact} />
+        <ApplyBar files={files} impact={impact} brandId={current} />
       </Flex>
     </Theme>
   );
