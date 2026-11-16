@@ -1,0 +1,6 @@
+{
+  "title": "Tabs",
+  "status": "stable",
+  "description": "Switch between short panels of content.",
+  "authoring": "One row per tab. Cell one: the tab label. Cell two: the panel content."
+}
