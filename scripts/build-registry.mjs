@@ -15,12 +15,14 @@ const pkg = JSON.parse(readFileSync(join(ROOT, 'package.json'), 'utf8'));
 const PREVIOUS = process.env.PREVIOUS_URL ? process.env.PREVIOUS_URL.replace(/\/?$/, '/') : '';
 
 /** Which brand-file field supplies each CSS variable a block uses. */
+const manifest = JSON.parse(readFileSync(join(PUB, 'manifest.json'), 'utf8'));
 function fieldOf(v) {
   if (/^--accent-/.test(v)) return 'theme.accentColor';
   if (/^--gray-/.test(v)) return 'theme.grayColor';
   if (/^--radius-/.test(v)) return 'theme.radius';
   if (/^--(space|font-size|line-height)-/.test(v)) return 'theme.scaling';
   if (/^--shadow-/.test(v)) return 'theme.appearance';
+  if (manifest.tokens?.[v]) return `tokens.${v}`;
   return {
     '--default-font-family': 'typography.bodyFont',
     '--ds-heading-font': 'typography.headingFont',
@@ -42,17 +44,17 @@ const blocks = readdirSync(SRC, { withFileTypes: true }).filter((d) => d.isDirec
   const dir = join(SRC, d.name);
   const files = readdirSync(dir).sort();
   const hash = createHash('sha1');
-  files.forEach((f) => hash.update(`${f}\n${readFileSync(join(dir, f))}`));
+  // sample.html and index.jsx are hub-side references; sites consume only what changes their output
+  files.filter((f) => !['sample.html', 'index.jsx'].includes(f)).forEach((f) => hash.update(`${f}\n${readFileSync(join(dir, f))}`));
   const css = existsSync(join(dir, `${d.name}.css`)) ? readFileSync(join(dir, `${d.name}.css`), 'utf8') : '';
   const tokens = [...new Set([...css.matchAll(/var\((--[\w-]+)/g)].map((m) => m[1]))].sort();
   const fields = [...new Set(tokens.map(fieldOf).filter(Boolean))].sort();
   const spec = existsSync(join(dir, 'spec.json')) ? JSON.parse(readFileSync(join(dir, 'spec.json'), 'utf8')) : {};
   cpSync(dir, join(outBlocks, d.name), { recursive: true });
-  return { name: d.name, title: spec.title || d.name, status: spec.status || 'stable', description: spec.description || '', authoring: spec.authoring || '', hash: hash.digest('hex').slice(0, 12), files, tokens, fields };
+  return { name: d.name, title: spec.title || d.name, status: spec.status || 'stable', tier: manifest.blocks?.[d.name] || 'core', description: spec.description || '', authoring: spec.authoring || '', hash: hash.digest('hex').slice(0, 12), files, tokens, fields };
 });
 
 // --- current brands ---
-const manifest = JSON.parse(readFileSync(join(PUB, 'manifest.json'), 'utf8'));
 const brands = Object.fromEntries(manifest.brands.map((b) => [b.id, JSON.parse(readFileSync(join(PUB, b.file), 'utf8'))]));
 
 const registry = { version: pkg.version, generatedAt: new Date().toISOString(), blocks };

@@ -13,5 +13,19 @@
       "name": "Distributor A",
       "file": "brands/distributor-a.json"
     }
-  ]
+  ],
+  "repo": "ynaka-adobe/radix-design-system",
+  "blocks": {
+    "hero": "core",
+    "cards": "core",
+    "teaser": "core",
+    "button": "core",
+    "accordion": "collection"
+  },
+  "tokens": {
+    "--ds-accordion-divider": {
+      "description": "Thickness of the divider between accordion items",
+      "default": "1px"
+    }
+  }
 }

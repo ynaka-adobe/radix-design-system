@@ -1,0 +1,1 @@
+{ "title": "Accordion", "status": "stable", "description": "Collapsible rows. A primitive: behavior is shared, appearance comes from the brand.", "authoring": "One row per item. Cell one: the label. Cell two: the content." }

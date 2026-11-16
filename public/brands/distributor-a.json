@@ -1,6 +1,12 @@
 {
   "name": "Distributor A",
-  "theme": { "accentColor": "gold", "grayColor": "sand", "radius": "none", "scaling": "110%", "appearance": "dark" },
+  "theme": {
+    "accentColor": "gold",
+    "grayColor": "sand",
+    "radius": "none",
+    "scaling": "110%",
+    "appearance": "dark"
+  },
   "typography": {
     "headingFont": "Georgia, 'Times New Roman', serif",
     "bodyFont": "'Helvetica Neue', Arial, sans-serif",
@@ -8,5 +14,11 @@
     "headingTracking": "0.12em",
     "headingTransform": "uppercase"
   },
-  "layout": { "sectionSpace": "9", "containerSize": "3" }
+  "layout": {
+    "sectionSpace": "9",
+    "containerSize": "3"
+  },
+  "tokens": {
+    "--ds-accordion-divider": "2px"
+  }
 }
