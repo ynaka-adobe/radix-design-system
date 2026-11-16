@@ -4,8 +4,9 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
+    "registry": "node scripts/build-registry.mjs",
+    "dev": "npm run registry && vite",
+    "build": "npm run registry && vite build",
     "preview": "vite preview"
   },
   "dependencies": {

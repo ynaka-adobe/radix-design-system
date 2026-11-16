@@ -25,6 +25,14 @@ A standalone design system built on [Radix Themes](https://www.radix-ui.com/them
 ```
 `sectionSpace` is a Radix space step (1 to 9) and `containerSize` is a Radix container size (1 to 4).
 
+## EDS blocks (the Edge Delivery spoke)
+The hub owns the EDS blocks too, just as it owns React components.
+- `eds/blocks/<name>/` holds each block: `<name>.js`, `<name>.css` and a `spec.json` (title, status, description, authoring guidance).
+- `npm run registry` (also run by `dev` and `build`) writes `registry.json` (blocks, content hashes, and the design system fields each block uses) and `changes.json` (what changed since the last published version, and which blocks it affects). Both are published with the site.
+- **Token changed:** the change report lists the field, old and new value, and every block that uses it. Sites read brands live, so they update with no code change. The EW app flags the affected blocks.
+- **New or changed block:** EDS sites run `scripts/ds-sync.mjs`, which opens a pull request in the site repo with the new block files. The EW app shows the block as "new" or "update available" until it is merged.
+- Bump `version` in `package.json` for each release. The spec is changed here only; the EW app reflects it.
+
 ## Publish
 In the GitHub repo settings, set Pages to deploy from **GitHub Actions** once. The workflow in `.github/workflows/pages.yml` does the rest.
 

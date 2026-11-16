@@ -1,0 +1,5 @@
+.teaser { padding: var(--ds-section-space, var(--space-8)) var(--space-5); background: var(--gray-3); color: var(--gray-12); border-left: var(--space-2) solid var(--accent-9); }
+.teaser > div { display: flex; gap: var(--space-5); align-items: center; max-width: var(--ds-container, 880px); margin: 0 auto; }
+.teaser h2 { margin: 0 0 var(--space-2); font-size: var(--font-size-6); }
+.teaser p { margin: 0; color: var(--gray-11); font-size: var(--font-size-3); }
+.teaser picture, .teaser img { display: block; max-width: 220px; border-radius: var(--radius-4); }

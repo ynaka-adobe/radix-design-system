@@ -1,0 +1,1 @@
+{ "title": "Cards", "status": "stable", "description": "A grid of short cards, each with a heading and text.", "authoring": "One row per card. Each row has one cell with a heading (h3) and a paragraph." }

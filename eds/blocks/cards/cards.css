@@ -1,0 +1,4 @@
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: var(--space-4); padding: var(--ds-section-space, var(--space-8)) var(--space-5); max-width: var(--ds-container, 880px); margin: 0 auto; box-sizing: content-box; }
+.cards > div { background: var(--gray-2); color: var(--gray-12); border: 1px solid var(--gray-6); border-radius: var(--radius-4); box-shadow: var(--shadow-3); padding: var(--space-5); }
+.cards h3 { margin: 0 0 var(--space-2); color: var(--accent-11); font-size: var(--font-size-4); }
+.cards p { margin: 0; color: var(--gray-11); font-size: var(--font-size-3); }

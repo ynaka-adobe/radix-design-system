@@ -1,0 +1,5 @@
+.hero { background: var(--gray-3); color: var(--gray-12); padding: var(--ds-section-space, var(--space-8)) var(--space-5); text-align: center; }
+.hero > div > div { max-width: var(--ds-container, 880px); margin: 0 auto; }
+.hero h1 { font-size: clamp(var(--font-size-7), 5vw, var(--font-size-9)); line-height: 1.1; margin: 0 0 var(--space-4); }
+.hero p { color: var(--gray-11); font-size: var(--font-size-4); margin: 0 auto var(--space-5); }
+.hero a { display: inline-block; background: var(--accent-9); color: var(--accent-contrast); padding: var(--space-3) var(--space-5); border-radius: max(var(--radius-3), var(--radius-full)); text-decoration: none; font-size: var(--font-size-3); }
