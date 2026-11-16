@@ -1,0 +1,8 @@
+.tabs { max-width: var(--ds-container, 880px); margin: 0 auto; padding: var(--ds-section-space, var(--space-8)) var(--space-5); box-sizing: content-box; }
+.tabs .tabs-list { display: flex; gap: var(--space-1); border-bottom: 1px solid var(--gray-6); }
+.tabs .tabs-trigger { appearance: none; background: none; border: 0; border-bottom: 2px solid transparent; margin-bottom: -1px; padding: var(--space-3) var(--space-4); color: var(--gray-11); font: inherit; font-size: var(--font-size-3); cursor: pointer; border-radius: var(--radius-2) var(--radius-2) 0 0; }
+.tabs .tabs-trigger:hover { color: var(--gray-12); background: var(--gray-3); }
+.tabs .tabs-trigger[data-state='active'] { color: var(--accent-11); border-bottom-color: var(--accent-9); }
+.tabs .tabs-trigger:focus-visible { outline: 2px solid var(--accent-8); outline-offset: -2px; }
+.tabs .tabs-panel { padding: var(--space-4) 0; color: var(--gray-12); font-size: var(--font-size-3); }
+.tabs .tabs-panel p { margin: 0; }
