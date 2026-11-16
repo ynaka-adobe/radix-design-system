@@ -1,5 +1,5 @@
 {
-  "name": "Toyota",
+  "name": "OEM",
   "theme": { "accentColor": "red", "grayColor": "gray", "radius": "full", "scaling": "100%", "appearance": "light" },
   "typography": {
     "headingFont": "'Helvetica Neue', Arial, sans-serif",

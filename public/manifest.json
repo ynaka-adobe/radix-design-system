@@ -3,7 +3,15 @@
   "radixThemes": "3.3.0",
   "tokensCss": "https://cdn.jsdelivr.net/npm/@radix-ui/themes@3.3.0/tokens.css",
   "brands": [
-    { "id": "toyota", "name": "Toyota", "file": "brands/toyota.json" },
-    { "id": "lexus", "name": "Lexus", "file": "brands/lexus.json" }
+    {
+      "id": "oem",
+      "name": "OEM",
+      "file": "brands/oem.json"
+    },
+    {
+      "id": "distributor-a",
+      "name": "Distributor A",
+      "file": "brands/distributor-a.json"
+    }
   ]
 }

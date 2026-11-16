@@ -17,7 +17,7 @@ A standalone design system built on [Radix Themes](https://www.radix-ui.com/them
 ## Brand file
 ```json
 {
-  "name": "Toyota",
+  "name": "OEM",
   "theme": { "accentColor": "red", "grayColor": "gray", "radius": "full", "scaling": "100%", "appearance": "light" },
   "typography": { "headingFont": "...", "bodyFont": "...", "headingWeight": "700", "headingTracking": "0", "headingTransform": "none" },
   "layout": { "sectionSpace": "8", "containerSize": "3" }
