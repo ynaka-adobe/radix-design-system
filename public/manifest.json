@@ -20,7 +20,8 @@
     "cards": "core",
     "teaser": "core",
     "button": "core",
-    "accordion": "collection"
+    "accordion": "collection",
+    "banner": "collection"
   },
   "tokens": {
     "--ds-accordion-divider": {

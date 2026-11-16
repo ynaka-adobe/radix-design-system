@@ -1,0 +1,8 @@
+.banner {
+  padding: var(--ds-section-space, var(--space-8)) var(--space-5);
+  max-width: var(--ds-container, 880px);
+  margin: 0 auto;
+  color: var(--gray-12);
+}
+.banner { background: var(--accent-3); color: var(--accent-12); border-left: var(--space-2) solid var(--accent-9); border-radius: var(--radius-3); padding: var(--space-4) var(--space-5); max-width: var(--ds-container, 880px); margin: var(--space-5) auto; }
+.banner p { margin: 0; font-size: var(--font-size-3); }
