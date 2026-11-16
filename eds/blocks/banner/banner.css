@@ -3,7 +3,7 @@
   color: var(--accent-12);
   border-left: var(--space-2) solid var(--accent-9);
   border-radius: var(--radius-3);
-  padding: var(--space-4) var(--space-5);
+  padding: var(--space-5) var(--space-6);
   max-width: var(--ds-container, 880px);
   margin: var(--space-5) auto;
 }
