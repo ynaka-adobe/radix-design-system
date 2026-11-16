@@ -1,6 +1,12 @@
 {
   "name": "OEM",
-  "theme": { "accentColor": "red", "grayColor": "gray", "radius": "full", "scaling": "100%", "appearance": "light" },
+  "theme": {
+    "accentColor": "orange",
+    "grayColor": "gray",
+    "radius": "full",
+    "scaling": "100%",
+    "appearance": "light"
+  },
   "typography": {
     "headingFont": "'Helvetica Neue', Arial, sans-serif",
     "bodyFont": "'Helvetica Neue', Arial, sans-serif",
@@ -8,5 +14,8 @@
     "headingTracking": "0",
     "headingTransform": "none"
   },
-  "layout": { "sectionSpace": "8", "containerSize": "3" }
+  "layout": {
+    "sectionSpace": "8",
+    "containerSize": "3"
+  }
 }
