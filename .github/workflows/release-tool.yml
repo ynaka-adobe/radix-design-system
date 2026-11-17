@@ -30,7 +30,8 @@ jobs:
       - name: Publish the release
         env:
           GH_TOKEN: ${{ github.token }}
-        run: gh release create "$GITHUB_REF_NAME" "radix-designer-$VERSION.zip" --title "Radix Designer $VERSION" --notes "sha256: \`$SHA256\`"
+        run: |
+          gh release create "$GITHUB_REF_NAME" "radix-designer-$VERSION.zip" --title "Radix Designer $VERSION" --notes "sha256: \`$SHA256\`"
       - name: List the release in tools.json on main
         env:
           GH_TOKEN: ${{ github.token }}
