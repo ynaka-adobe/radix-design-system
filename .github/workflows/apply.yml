@@ -1,0 +1,119 @@
+name: Apply design update
+# Privileged steps for a design update, run by hand (Actions tab > Run workflow, or `gh workflow run apply.yml`).
+# The hub uses GITHUB_TOKEN. The site repo uses the repository secret SITE_REPO_TOKEN (see the README).
+on:
+  workflow_dispatch:
+    inputs:
+      action:
+        description: What to do
+        type: choice
+        required: true
+        options: [merge-and-publish, refresh-site-branch, cleanup]
+      branch:
+        description: Draft branch name (design-update-<digits> or block-<name>)
+        type: string
+        required: true
+      merge_site_pr:
+        description: merge-and-publish only. Also merge the site pull request (otherwise it is left open for review)
+        type: boolean
+        default: false
+permissions:
+  contents: write
+  pull-requests: write
+  actions: write
+concurrency:
+  group: apply-${{ inputs.branch }}
+  cancel-in-progress: false
+env:
+  SITE_REPO: ynaka-adobe/ew-radix-brands
+  ACTION: ${{ inputs.action }}
+  BRANCH: ${{ inputs.branch }}
+  GH_TOKEN: ${{ github.token }}
+  SITE_TOKEN: ${{ secrets.SITE_REPO_TOKEN }}
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Validate inputs
+        run: |
+          if ! [[ "$BRANCH" =~ ^design-update-[0-9]+$ || "$BRANCH" =~ ^block-[a-z0-9-]+$ ]]; then
+            echo "::error::Branch '$BRANCH' must match design-update-<digits> or block-<name>"; exit 1
+          fi
+          if [ -z "$SITE_TOKEN" ]; then
+            echo "::error::Repository secret SITE_REPO_TOKEN is not set. See the README section 'Manual apply workflow'."; exit 1
+          fi
+
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Refresh the site branch
+        if: inputs.action == 'refresh-site-branch'
+        run: |
+          set -euo pipefail
+          git fetch origin "$BRANCH"
+          FILES=$(git diff --name-only "origin/main...origin/$BRANCH" | grep -E '^eds/blocks/[^/]+/[^/]+\.(css|js)$' || true)
+          [ -n "$FILES" ] || echo "No block code changed on $BRANCH. The site branch will match main."
+          git clone --quiet "https://x-access-token:${SITE_TOKEN}@github.com/${SITE_REPO}.git" /tmp/site
+          cd /tmp/site
+          git checkout -q -B "$BRANCH" "$(git ls-remote origin "refs/heads/$BRANCH" | grep -q . && echo "origin/$BRANCH" || echo origin/main)"
+          cd "$GITHUB_WORKSPACE"
+          for f in $FILES; do
+            dest="/tmp/site/${f#eds/}"; mkdir -p "$(dirname "$dest")"
+            git show "origin/$BRANCH:$f" > "$dest"
+          done
+          cd /tmp/site
+          git config user.name "github-actions[bot]"; git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git diff --cached --quiet || git commit -q -m "Design update preview"
+          git push -q origin "HEAD:refs/heads/$BRANCH"
+          echo "Preview: https://${BRANCH}--${SITE_REPO#*/}--${SITE_REPO%%/*}.aem.page/"
+
+      - name: Merge the draft and publish
+        if: inputs.action == 'merge-and-publish'
+        env:
+          MERGE_SITE_PR: ${{ inputs.merge_site_pr }}
+        run: |
+          set -euo pipefail
+          since=$(date +%s)
+          PR=$(gh pr list --head "$BRANCH" --state open --json number --jq '.[0].number // empty')
+          if [ -z "$PR" ]; then
+            PR=$(gh pr create --head "$BRANCH" --base main --title "Design update ($BRANCH)" --body "Created by the Apply design update workflow." | grep -oE '[0-9]+$')
+          fi
+          git fetch origin main "$BRANCH"
+          HAS_BLOCKS=$(git diff --name-only "origin/main...origin/$BRANCH" | grep -cE '^eds/blocks/' || true)
+          gh pr merge "$PR" --squash --delete-branch
+          gh api -X DELETE "repos/${SITE_REPO}/git/refs/heads/${BRANCH}" -H "Authorization: Bearer ${SITE_TOKEN}" >/dev/null 2>&1 || true
+          # Merges made with GITHUB_TOKEN do not start the Pages workflow by themselves.
+          gh workflow run pages.yml --ref main
+          pages="https://${GITHUB_REPOSITORY_OWNER}.github.io/${GITHUB_REPOSITORY#*/}/"
+          deployed=0
+          for i in $(seq 1 60); do
+            gen=$(curl -fsS "${pages}registry.json?t=$(date +%s)" | python3 -c 'import sys,json,datetime;print(int(datetime.datetime.fromisoformat(json.load(sys.stdin)["generatedAt"].replace("Z","+00:00")).timestamp()))' 2>/dev/null || echo 0)
+            if [ "$gen" -gt "$since" ]; then deployed=1; break; fi
+            sleep 5
+          done
+          [ "$deployed" = 1 ] || { echo "::error::The design system has not finished publishing yet."; exit 1; }
+          echo "Published: $pages"
+          if [ "$HAS_BLOCKS" = 0 ]; then echo "No block changes. Done."; exit 0; fi
+          GH_TOKEN="$SITE_TOKEN" gh workflow run ds-sync.yml --repo "$SITE_REPO" --ref main
+          site_pr=""
+          for i in $(seq 1 60); do
+            site_pr=$(GH_TOKEN="$SITE_TOKEN" gh pr list --repo "$SITE_REPO" --head design-system-sync --state open --json number,updatedAt --jq "map(select((.updatedAt|fromdateiso8601) > $since))|.[0].number // empty")
+            [ -n "$site_pr" ] && break
+            sleep 5
+          done
+          [ -n "$site_pr" ] || { echo "::error::The site pull request has not appeared yet."; exit 1; }
+          if [ "$MERGE_SITE_PR" = true ]; then
+            GH_TOKEN="$SITE_TOKEN" gh pr merge "$site_pr" --repo "$SITE_REPO" --squash --delete-branch
+            echo "Site pull request #$site_pr merged."
+          else
+            echo "Site pull request ready for review: https://github.com/${SITE_REPO}/pull/${site_pr}"
+          fi
+
+      - name: Clean up
+        if: inputs.action == 'cleanup'
+        run: |
+          gh api -X DELETE "repos/${SITE_REPO}/git/refs/heads/${BRANCH}" -H "Authorization: Bearer ${SITE_TOKEN}" >/dev/null 2>&1 || echo "No site branch ${BRANCH}."
+          PR=$(gh pr list --head "$BRANCH" --state open --json number --jq '.[0].number // empty')
+          if [ -n "$PR" ]; then gh pr close "$PR" --delete-branch; else git push origin --delete "$BRANCH" 2>/dev/null || echo "No hub branch ${BRANCH}."; fi

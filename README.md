@@ -36,6 +36,24 @@ The hub owns the EDS blocks too, just as it owns React components.
 ## Publish
 In the GitHub repo settings, set Pages to deploy from **GitHub Actions** once. The workflow in `.github/workflows/pages.yml` does the rest.
 
+## Manual apply workflow (no token in the browser)
+`.github/workflows/apply.yml` runs the privileged steps in GitHub Actions. It is started by hand, never from the browser: Actions tab > **Apply design update** > Run workflow, or the `gh` commands the Apply bar shows after Save draft. It uses `GITHUB_TOKEN` for this repo and the repository secret `SITE_REPO_TOKEN` for `ynaka-adobe/ew-radix-brands`.
+
+| action | what it does |
+| --- | --- |
+| `refresh-site-branch` | Copies the draft's changed block code onto a site branch with the same name, so Edge Delivery serves it at `https://<branch>--ew-radix-brands--ynaka-adobe.aem.page/`. |
+| `merge-and-publish` | Merges the draft pull request (opens it if missing), deletes the site branch, runs the Pages deploy and waits for it, then (if blocks changed) runs the site sync. The site pull request stays open for review unless `merge_site_pr=true`. |
+| `cleanup` | Deletes the site branch and closes the draft pull request and branch. |
+
+`branch` must match `^design-update-[0-9]+$` or `^block-[a-z0-9-]+$`. Example: `gh workflow run apply.yml --repo ynaka-adobe/radix-design-system -f action=merge-and-publish -f branch=design-update-202611161200`.
+
+**One-time setup** (you create the token yourself; it is never typed into the app):
+1. Create a fine-grained personal access token limited to `ynaka-adobe/ew-radix-brands` with **Contents**, **Pull requests** and **Actions**: read and write.
+2. `gh secret set SITE_REPO_TOKEN --repo ynaka-adobe/radix-design-system` and paste the token.
+3. In this repo's Settings > Actions > General, allow GitHub Actions to create and approve pull requests (needed when the workflow has to open the draft pull request).
+
+The browser flow with a token in the Apply bar still works and is optional.
+
 ## Radix Designer as an installable EDS tool
 The hub UI can also run inside an Edge Delivery site repo at `tools/radix-designer/radix-designer.html`. It reads `hub.json` next to it (`{ "repo", "pagesUrl" }`) and loads `manifest.json`, `brands/*.json` and `registry.json` from that hub at runtime, so the hub stays the source of truth.
 

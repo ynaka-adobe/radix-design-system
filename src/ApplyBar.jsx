@@ -1,12 +1,26 @@
 import { useEffect, useState } from 'react';
 import {
-  Flex, Text, Button, Badge, Card, TextField, Link, Callout,
+  Flex, Text, Button, Badge, Card, TextField, Link, Callout, Code,
 } from '@radix-ui/themes';
 import {
   saveDraft, ensurePullRequest, waitForCommit, mergePullRequest, getToken, setToken, REPO,
   waitForHubDeploy, startSiteSync, waitForSitePullRequest, mergeSitePullRequest, SITE_REPO,
   siteHost, waitForSiteBranch, deleteSiteBranch, ensureSiteBranch,
 } from './github.js';
+
+const cmd = (action, branch, extra = '') => `gh workflow run apply.yml --repo ${REPO} -f action=${action} -f branch=${branch}${extra}`;
+
+function Cmd({ label, text }) {
+  const [done, setDone] = useState(false);
+  const copy = async () => { await navigator.clipboard.writeText(text); setDone(true); setTimeout(() => setDone(false), 1500); };
+  return (
+    <Flex gap="2" align="center" wrap="wrap">
+      <Text size="1" color="gray" style={{ minWidth: 110 }}>{label}</Text>
+      <Code size="1" style={{ flex: 1, minWidth: 0, overflowWrap: 'anywhere' }}>{text}</Code>
+      <Button size="1" variant="soft" onClick={copy}>{done ? 'Copied' : 'Copy'}</Button>
+    </Flex>
+  );
+}
 
 const stamp = () => new Date().toISOString().slice(0, 16).replace(/[-:T]/g, '');
 
@@ -131,6 +145,20 @@ export default function ApplyBar({ files, impact, brandId, onDraft }) {
         {s.stage === 'sitePr' && <Callout.Root size="1" color="green"><Callout.Text>The block is ready for the site. <Link href={s.sitePr.url} target="_blank" rel="noreferrer">Review the pull request</Link> in {SITE_REPO}, then merge it.</Callout.Text></Callout.Root>}
         {s.stage === 'delivered' && <Callout.Root size="1" color="green"><Callout.Text>Delivered. The block is now in the site's code. Reload this page to start a new change.</Callout.Text></Callout.Root>}
         {s.stage === 'published' && <Callout.Root size="1" color="green"><Callout.Text>Published. The live design system updates in about a minute. Reload this page to start a new change.</Callout.Text></Callout.Root>}
+        {s.sha && (
+          <Callout.Root size="1" color="gray">
+            <Callout.Text asChild><div>
+              <Flex direction="column" gap="2">
+                <Text size="1" weight="bold">No token in the browser? Run the privileged steps in GitHub instead (needs the SITE_REPO_TOKEN secret, see the README).</Text>
+                {hasBlocks && <Cmd label="Site preview branch" text={cmd('refresh-site-branch', branch)} />}
+                <Cmd label="Publish" text={cmd('merge-and-publish', branch)} />
+                {hasBlocks && <Cmd label="Publish and merge site PR" text={cmd('merge-and-publish', branch, ' -f merge_site_pr=true')} />}
+                <Cmd label="Clean up" text={cmd('cleanup', branch)} />
+                <Link size="1" href={`https://github.com/${REPO}/actions/workflows/apply.yml`} target="_blank" rel="noreferrer">Open the Actions page (Run workflow)</Link>
+              </Flex>
+            </div></Callout.Text>
+          </Callout.Root>
+        )}
         {s.note && s.stage === 'ready' && <Text size="1" color="amber">{s.note}</Text>}
         {s.error && <Callout.Root size="1" color="red"><Callout.Text>{s.error}</Callout.Text></Callout.Root>}
         <Text size="1" color="gray">The token needs Contents and Pull requests: read and write on this repo. To deliver blocks to the site it also needs Contents, Actions and Pull requests: write on {SITE_REPO}. It stays in this tab and is never saved.</Text>
