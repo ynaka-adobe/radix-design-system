@@ -36,13 +36,6 @@ The hub owns the EDS blocks too, just as it owns React components.
 ## Publish
 In the GitHub repo settings, set Pages to deploy from **GitHub Actions** once. The workflow in `.github/workflows/pages.yml` does the rest.
 
-## Sample page for previews
-The Brands tab previews a controlled sample page on the EDS site (default path `/ds-sample`) with `?brand=<id>` and `?ds=<draft sha>`, so it shows saved drafts: press Save draft to refresh. The page holds one sample block per section, generated from each block's `sample.html` and published at `ds-sample.html` on Pages (also the **Copy sample page HTML** button).
-To create it: in DA open a new page at `/ds-sample`, paste the copied HTML (or the published `ds-sample.html`), then preview and publish it. Until it exists the hub shows a built-in copy of the same page using the site's block code, and keeps posting the unsaved brand JSON to the iframe as `{type:'ds-brand-preview', brand}` for a future site-side listener.
-
-## Parity tab
-Rows are every block in the hub. Column one renders the block from the design system. Column two is the main (first) brand and each further column is another brand from `manifest.json`, all rendered with the real EDS block code read from the site repo (derived from the Site URL on the Brands tab). Each cell shows the original parity check (missing brand fields, hardcoded colours) and each row shows whether the site's block hash matches the registry. The site does not send CORS headers, so block code is read from the site repo on GitHub, not from the aem.page host. It reflects the site's published branch, not an unsaved draft.
-
 ## Manual apply workflow (no token in the browser)
 `.github/workflows/apply.yml` runs the privileged steps in GitHub Actions. It is started by hand, never from the browser: Actions tab > **Apply design update** > Run workflow, or the `gh` commands the Apply bar shows after Save draft. It uses `GITHUB_TOKEN` for this repo and the repository secret `SITE_REPO_TOKEN` for `ynaka-adobe/ew-radix-brands`.
 

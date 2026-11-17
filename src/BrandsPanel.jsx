@@ -1,23 +1,10 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useMemo, useState } from 'react';
 import {
-  Flex, Box, Grid, Heading, Text, Button, Card,
+  Theme, Flex, Box, Grid, Heading, Text, Button, Card, Container,
   Separator, Badge, Code, Callout, Switch,
 } from '@radix-ui/themes';
 import { Field, Pick, Text1 } from './ui.jsx';
-import { varsIn, samplePageHtml, sampleDoc, loadSiteCode, pageExists } from './ds.js';
-import { sitePreviewUrl } from './github.js';
-
-
-function SampleFrame({ url, title, brand, doc }) {
-  const ref = useRef(null);
-  const post = () => {
-    try { ref.current?.contentWindow?.postMessage({ type: 'ds-brand-preview', brand }, new URL(url).origin); } catch (e) { /* not ready */ }
-  };
-  useEffect(post, [brand, url]);
-  const style = { width: '100%', height: 640, border: '1px solid var(--gray-5)', borderRadius: 'var(--radius-3)', background: 'white' };
-  if (doc) return <iframe title={title} sandbox="allow-scripts" srcDoc={doc} style={style} />;
-  return <iframe ref={ref} onLoad={post} key={url} src={url} title={title} style={style} />;
-}
+import { varsIn } from './ds.js';
 
 const ACCENTS = ['gold', 'bronze', 'brown', 'red', 'crimson', 'ruby', 'tomato', 'orange', 'amber', 'yellow', 'lime', 'grass', 'green', 'jade', 'mint', 'teal', 'cyan', 'sky', 'blue', 'indigo', 'iris', 'violet', 'purple', 'plum', 'pink'];
 const GRAYS = ['gray', 'mauve', 'slate', 'sage', 'olive', 'sand'];
@@ -25,6 +12,54 @@ const RADII = ['none', 'small', 'medium', 'large', 'full'];
 const SCALINGS = ['90%', '95%', '100%', '105%', '110%'];
 const STEPS = ['1', '2', '3', '4', '5', '6', '7', '8', '9'];
 const CONTAINERS = ['1', '2', '3', '4'];
+
+/** The brand rendered with real Radix Themes components. Mirrors the Edge Delivery blocks. */
+function Preview({ brand }) {
+  const { theme, typography: t, layout } = brand;
+  const heading = { fontFamily: t.headingFont, fontWeight: t.headingWeight, letterSpacing: t.headingTracking, textTransform: t.headingTransform };
+  const vars = { '--default-font-family': t.bodyFont };
+  return (
+    <Theme {...theme} hasBackground style={{ minHeight: 'auto', ...vars, borderRadius: 'var(--radius-4)' }}>
+      <Box style={{ background: 'var(--gray-3)' }} py={layout.sectionSpace}>
+        <Container size={layout.containerSize} px="5">
+          <Flex direction="column" align="center" gap="4" style={{ textAlign: 'center' }}>
+            <Heading size="8" style={heading}>Drive what moves you</Heading>
+            <Text size="4" color="gray">One set of blocks. Every brand renders as itself.</Text>
+            <Button size="3">Explore models</Button>
+          </Flex>
+        </Container>
+      </Box>
+      <Box py={layout.sectionSpace}>
+        <Container size={layout.containerSize} px="5">
+          <Grid columns={{ initial: '1', sm: '3' }} gap="4">
+            {[['Hybrid', 'Efficiency without compromise.'], ['Safety', 'Standard on every trim.'], ['Service', 'Book in two taps.']].map(([h, p]) => (
+              <Card key={h} size="3">
+                <Heading size="4" mb="2" color={theme.accentColor} style={heading}>{h}</Heading>
+                <Text color="gray">{p}</Text>
+              </Card>
+            ))}
+          </Grid>
+        </Container>
+      </Box>
+      <Box style={{ background: 'var(--gray-3)', borderLeft: '6px solid var(--accent-9)' }} py={layout.sectionSpace}>
+        <Container size={layout.containerSize} px="5">
+          <Heading size="6" mb="2" style={heading}>Find your fit</Heading>
+          <Text color="gray">Compare trims side by side and see what changes between brands.</Text>
+        </Container>
+      </Box>
+      <Box py="6">
+        <Container size={layout.containerSize} px="5">
+          <Flex gap="3" wrap="wrap">
+            <Button size="3">Build yours</Button>
+            <Button size="3" variant="outline">Find a dealer</Button>
+            <Badge size="2">New</Badge>
+          </Flex>
+        </Container>
+      </Box>
+    </Theme>
+  );
+}
+
 
 function NewToken({ manifest, setManifest, blocks, setBlocks }) {
   const [open, setOpen] = useState(false);
@@ -60,11 +95,7 @@ function NewToken({ manifest, setManifest, blocks, setBlocks }) {
   );
 }
 
-export default function BrandsPanel({ manifest, setManifest, brands, setBrands, blocks, setBlocks, current, setCurrent, compare, setCompare, draft, site, setSite }) {
-  const [path, setPath] = useState('/ds-sample');
-  const [exists, setExists] = useState(null);
-  const [siteCode, setSiteCode] = useState({});
-  const [sampleCopied, setSampleCopied] = useState(false);
+export default function BrandsPanel({ manifest, setManifest, brands, setBrands, blocks, setBlocks, current, setCurrent, compare, setCompare }) {
   const [copied, setCopied] = useState(false);
   const brand = brands[current];
   const other = manifest.brands.find((b) => b.id !== current)?.id;
@@ -81,37 +112,13 @@ export default function BrandsPanel({ manifest, setManifest, brands, setBrands, 
   };
   const copy = async () => { await navigator.clipboard.writeText(json); setCopied(true); setTimeout(() => setCopied(false), 1500); };
   const tokenEntries = Object.entries(manifest.tokens || {});
-  const names = Object.keys(blocks);
-  const samplePath = path.replace(/^\/?/, '/').replace(/\/$/, '') || '/';
-
-  useEffect(() => {
-    let live = true;
-    setExists(null);
-    pageExists(`${site.replace(/\/?$/, '/')}${samplePath.slice(1)}.plain.html`).then((v) => { if (live) setExists(v); });
-    return () => { live = false; };
-  }, [site, samplePath]);
-  useEffect(() => {
-    let live = true;
-    if (exists === false) loadSiteCode(site, names).then((c) => { if (live) setSiteCode(c); });
-    return () => { live = false; };
-  }, [exists, site, names.join()]);
-
-  const fallbackDoc = (b) => {
-    const items = Object.values(blocks).filter((x) => x.sample).map((x) => ({ name: x.name, sample: x.sample, css: siteCode[x.name]?.css ?? x.css, js: siteCode[x.name]?.js ?? x.js }));
-    const order = (samplePageHtml(blocks, manifest).match(/class="([\w-]+)"/g) || []).map((c) => c.slice(7, -1));
-    items.sort((a, c) => order.indexOf(a.name) - order.indexOf(c.name));
-    return sampleDoc({ brand: b, manifest, items });
-  };
-  const copySample = async () => { await navigator.clipboard.writeText(samplePageHtml(blocks, manifest)); setSampleCopied(true); setTimeout(() => setSampleCopied(false), 1500); };
-  const frame = (id) => (exists === null
-    ? <Text size="2" color="gray">Checking the site page…</Text>
-    : <SampleFrame brand={brands[id]} title={`${id} sample page`} url={sitePreviewUrl(site, samplePath, id, draft?.sha)} doc={exists ? undefined : fallbackDoc(brands[id])} />);
+  const previewBrand = (b) => ({ ...b, tokens: undefined });
 
   return (
     <Flex direction={{ initial: 'column', md: 'row' }} align="stretch">
       <Box p="4" width={{ initial: '100%', md: '360px' }} flexShrink="0" className="brands-sidebar" style={{ borderRight: '1px solid var(--gray-5)', borderBottom: '1px solid var(--gray-5)', boxSizing: 'border-box', minWidth: 0 }}>
         <Flex direction="column" gap="3">
-          <Text size="2" color="gray">Edit a brand and preview it on the sample page. Save a draft from the bar at the bottom, preview it, then publish.</Text>
+          <Text size="2" color="gray">Edit a brand and preview it with real Radix Themes components. Save a draft from the bar at the bottom, preview it, then publish.</Text>
           <Pick label="Brand" value={current} options={manifest.brands.map((b) => b.id)} onChange={setCurrent} />
           <Flex align="center" gap="2"><Switch checked={compare} onCheckedChange={setCompare} /><Text size="2">Compare with {other}</Text></Flex>
           <Separator size="4" />
@@ -150,23 +157,9 @@ export default function BrandsPanel({ manifest, setManifest, brands, setBrands, 
 
       <Box p="4" style={{ flex: 1, minWidth: 0, paddingBottom: 160 }}>
         <Flex direction="column" gap="4">
-          <Card size="2">
-            <Flex direction="column" gap="2">
-              <Flex gap="3" wrap="wrap" align="end">
-                <Box style={{ flex: 2, minWidth: 220 }}><Text1 label="Site URL" value={site} onChange={setSite} /></Box>
-                <Box style={{ flex: 1, minWidth: 120 }}><Text1 label="Sample page path" value={path} onChange={setPath} placeholder="/ds-sample" /></Box>
-                <Button size="2" variant="soft" onClick={copySample}>{sampleCopied ? 'Copied' : 'Copy sample page HTML'}</Button>
-              </Flex>
-              <Text size="1" color="gray">
-                {exists === false
-                  ? `No page at ${samplePath} on the site yet, so the built-in sample page is shown (it uses the site's block code and updates as you edit). Copy the sample page HTML and paste it into DA at ${samplePath}.`
-                  : `Sample page ${samplePath} on the site. Shows saved drafts; press Save draft to refresh${draft?.dirty ? ' (you have unsaved changes)' : ''}.`}
-              </Text>
-            </Flex>
-          </Card>
           <Grid columns={compare && other ? { initial: '1', lg: '2' } : '1'} gap="4">
-            {frame(current)}
-            {compare && other && frame(other)}
+            <Preview brand={previewBrand(brand)} />
+            {compare && other && <Preview brand={previewBrand(brands[other])} />}
           </Grid>
           <Card size="2">
             <Flex direction="column" gap="3">

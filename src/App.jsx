@@ -2,7 +2,6 @@ import { useEffect, useMemo, useState } from 'react';
 import { Theme, Flex, Box, Heading, Text, Tabs } from '@radix-ui/themes';
 import BrandsPanel from './BrandsPanel.jsx';
 import BlocksPanel from './BlocksPanel.jsx';
-import ParityPanel from './ParityPanel.jsx';
 import ApplyBar from './ApplyBar.jsx';
 import { loadDs, fieldsIn, flat } from './ds.js';
 
@@ -25,7 +24,6 @@ export default function App({ hub = './' }) {
   const [current, setCurrent] = useState(null);
   const [compare, setCompare] = useState(false);
   const [draft, setDraft] = useState(null);
-  const [site, setSite] = useState('https://main--ew-radix-brands--ynaka-adobe.aem.page/');
   const [error, setError] = useState('');
 
   useEffect(() => {
@@ -69,20 +67,18 @@ export default function App({ hub = './' }) {
   if (error) return <Theme><Box p="6"><Text color="red">Could not load the design system: {error}</Text></Box></Theme>;
   if (!brands) return <Theme><Box p="6"><Text>Loading design system…</Text></Box></Theme>;
 
-  const shared = { manifest, setManifest, brands, setBrands, blocks, setBlocks, current, setCurrent, compare, setCompare, draft, site, setSite };
+  const shared = { manifest, setManifest, brands, setBrands, blocks, setBlocks, current, setCurrent, compare, setCompare, draft };
   return (
     <Theme accentColor="indigo" grayColor="slate" radius="medium" hasBackground>
       <Flex direction="column" style={{ minHeight: '100vh' }}>
         <Box px="4" pt="3"><Heading size="4">Radix Design System</Heading></Box>
-        <Tabs.Root defaultValue={window.location.hash === '#parity' ? 'parity' : 'brands'} style={{ flex: 1 }}>
+        <Tabs.Root defaultValue="brands" style={{ flex: 1 }}>
           <Box px="4"><Tabs.List>
             <Tabs.Trigger value="brands">Brands and tokens</Tabs.Trigger>
-            <Tabs.Trigger value="parity">Parity</Tabs.Trigger>
             <Tabs.Trigger value="primitives">Primitives and block collection</Tabs.Trigger>
             <Tabs.Trigger value="components">Components (boilerplate)</Tabs.Trigger>
           </Tabs.List></Box>
           <Tabs.Content value="brands"><BrandsPanel {...shared} /></Tabs.Content>
-          <Tabs.Content value="parity"><ParityPanel {...shared} hub={hub} /></Tabs.Content>
           <Tabs.Content value="primitives"><BlocksPanel {...shared} tier="collection" editable /></Tabs.Content>
           <Tabs.Content value="components"><BlocksPanel {...shared} tier="core" editable={false} /></Tabs.Content>
         </Tabs.Root>

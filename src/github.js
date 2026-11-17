@@ -85,14 +85,6 @@ export function configureHub({ repo, pagesUrl }) {
   if (pagesUrl) HUB_URL = pagesUrl.replace(/\/?$/, '/');
 }
 
-/** URL of a site page showing a brand, optionally with a saved draft of the design system. */
-export function sitePreviewUrl(site, path, brand, draftSha) {
-  const u = new URL(path || '/', site);
-  u.searchParams.set('brand', brand);
-  if (draftSha) u.searchParams.set('ds', `https://raw.githubusercontent.com/${REPO}/${draftSha}/public/`);
-  return u.toString();
-}
-
 /** Wait until the published design system is newer than the moment of publishing. */
 export async function waitForHubDeploy(since, tries = 40) {
   for (let i = 0; i < tries; i += 1) {

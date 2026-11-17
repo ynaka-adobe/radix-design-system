@@ -50,41 +50,6 @@ export const flat = (o, p = '') => Object.entries(o || {}).flatMap(([k, v]) => (
 
 const esc = (v) => String(v).replace(/[&"<>]/g, (c) => ({ '&': '&amp;', '"': '&quot;', '<': '&lt;', '>': '&gt;' }[c]));
 
-/** Plain EDS content HTML: one section per block, built from each block's sample.html. Core blocks first. */
-export function samplePageHtml(blocks, manifest) {
-  const rank = (b) => (b.tier === 'core' ? 0 : 1);
-  const list = Object.values(blocks).filter((b) => b.sample).sort((a, b) => rank(a) - rank(b) || a.name.localeCompare(b.name));
-  const sections = list.map((b) => `    <div>\n      ${b.sample.trim()}\n    </div>`).join('\n');
-  return `<body>\n  <header></header>\n  <main>\n${sections}\n  </main>\n  <footer></footer>\n</body>\n`;
-}
-
-// https://<ref>--<repo>--<owner>.aem.page/ maps to the site repo on GitHub, whose raw files allow CORS (aem.page does not).
-export function siteRaw(site) {
-  const m = /^https?:\/\/([^.]+)\.aem\.(?:page|live)/.exec(site || '');
-  const [ref, repo, owner] = (m?.[1] || '').split('--');
-  return owner && repo ? `https://raw.githubusercontent.com/${owner}/${repo}/${ref || 'main'}/` : '';
-}
-
-/** The site's own block code, keyed by block name. Blocks the site does not have are omitted. */
-export async function loadSiteCode(site, names) {
-  const raw = siteRaw(site);
-  const out = {};
-  if (!raw) return out;
-  await Promise.all(names.map(async (n) => {
-    const [css, js] = await Promise.all([getText(`${raw}blocks/${n}/${n}.css`).catch(() => ''), getText(`${raw}blocks/${n}/${n}.js`).catch(() => '')]);
-    if (css || js) out[n] = { css, js };
-  }));
-  return out;
-}
-
-/** Does the site serve this page? A script tag exposes the HTTP status without needing CORS. */
-export const pageExists = (url) => new Promise((resolve) => {
-  const s = document.createElement('script');
-  const done = (v) => { s.remove(); resolve(v); };
-  s.onload = () => done(true); s.onerror = () => done(false);
-  s.src = url; document.head.append(s);
-});
-
 /** A standalone document that shows blocks in one brand. Runs each block's EDS decorate(). */
 export function sampleDoc({ brand, manifest, items }) {
   const b = effective(brand, manifest);
