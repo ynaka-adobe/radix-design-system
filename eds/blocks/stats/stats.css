@@ -1,0 +1,5 @@
+.stats { max-width: var(--ds-container, 880px); margin: 0 auto; padding: var(--ds-section-space, var(--space-8)) var(--space-5); box-sizing: content-box; }
+.stats dl { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: var(--space-5); margin: 0; }
+.stats dl > div { border-top: var(--space-1) solid var(--accent-9); padding-top: var(--space-3); }
+.stats dd { margin: 0; color: var(--gray-12); font-family: var(--ds-heading-font, inherit); font-weight: var(--ds-heading-weight, 700); font-size: var(--font-size-8); line-height: var(--line-height-8); }
+.stats dt { margin-top: var(--space-1); color: var(--gray-11); font-size: var(--font-size-3); }

@@ -1,0 +1,6 @@
+{
+  "title": "Stats",
+  "status": "stable",
+  "description": "A row of key figures, each with a label.",
+  "authoring": "One row per figure. Cell one: the number. Cell two: the label."
+}
