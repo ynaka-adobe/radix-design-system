@@ -73,7 +73,7 @@ export default function App({ hub = './' }) {
     <Theme accentColor="indigo" grayColor="slate" radius="medium" hasBackground>
       <Flex direction="column" style={{ minHeight: '100vh' }}>
         <Box px="4" pt="3"><Heading size="4">Radix Design System</Heading></Box>
-        <Tabs.Root defaultValue="brands" style={{ flex: 1 }}>
+        <Tabs.Root defaultValue={window.location.hash === '#parity' ? 'parity' : 'brands'} style={{ flex: 1 }}>
           <Box px="4"><Tabs.List>
             <Tabs.Trigger value="brands">Brands and tokens</Tabs.Trigger>
             <Tabs.Trigger value="parity">Parity</Tabs.Trigger>

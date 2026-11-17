@@ -74,29 +74,29 @@ export default function ParityPanel({ manifest, brands, blocks, hub = './' }) {
   });
   const synced = names.filter((n) => lock?.blocks?.[n]?.hash && lock.blocks[n].hash === registry[n]?.hash).length;
 
-  const cols = `repeat(${list.length + 1}, minmax(220px, 1fr))`;
+  const cols = `150px repeat(${list.length}, minmax(220px, 1fr))`;
   return (
     <Box p="4" style={{ overflowX: 'auto', paddingBottom: 160 }}>
-      <Flex direction="column" gap="3" style={{ minWidth: 220 * (list.length + 1) }}>
+      <Flex direction="column" gap="3" style={{ minWidth: 150 + 220 * list.length + 16 * list.length }}>
         <Text size="2" color="gray">
           Design system v{manifest.version}, Radix Themes {manifest.radixThemes}. {loaded ? `Site blocks in sync: ${synced}/${names.length}. ` : 'Loading site code… '}
-          Coverage: {score.join(' · ')}. Block code is read from <Code size="1">{raw}</Code>; columns come from the brand list.
+          Coverage: {score.join(' · ')}. Rows are the designer hub blocks, one column per brand. Block code is read from <Code size="1">{raw}</Code>.
         </Text>
         <Box style={{ display: 'grid', gridTemplateColumns: cols, gap: 16 }}>
-          <Text weight="bold">Design system</Text>
-          {list.map((b, i) => <Text key={b.id} weight="bold">{i === 0 ? `${b.name} (main brand, EDS blocks)` : `${b.name} (EDS blocks)`}</Text>)}
+          <Text weight="bold">Block</Text>
+          {list.map((b) => <Text key={b.id} weight="bold">{b.name}</Text>)}
         </Box>
         {names.map((n) => {
           const bl = blocks[n]; const reg = registry[n]; const sc = siteCode[n];
           const inSync = lock?.blocks?.[n]?.hash === reg?.hash;
           return (
-            <Card key={n}><Flex direction="column" gap="2">
-              <Flex gap="2" align="center"><Text weight="bold">{n}</Text><Badge color={bl.tier === 'core' ? 'indigo' : 'gray'}>{bl.tier}</Badge>
-                {loaded && sc?.css && <Badge color={inSync ? 'green' : 'amber'}>{inSync ? 'site in sync' : 'site differs from design system'}</Badge>}
-              </Flex>
+            <Card key={n}>
               <Box style={{ display: 'grid', gridTemplateColumns: cols, gap: 16 }}>
-                <Cell brand={list[0]} manifest={manifest} name={n} css={bl.css} js={bl.js} sample={bl.sample}
-                  status={<Text size="1" color="gray">Design system · react app</Text>} />
+                <Flex direction="column" gap="2" align="start">
+                  <Text weight="bold">{n}</Text>
+                  <Badge color={bl.tier === 'core' ? 'indigo' : 'gray'}>{bl.tier}</Badge>
+                  {loaded && sc?.css && <Badge color={inSync ? 'green' : 'amber'}>{inSync ? 'site in sync' : 'site differs'}</Badge>}
+                </Flex>
                 {list.map((b) => {
                   if (!loaded) return <Text key={b.id} size="1" color="gray">Loading…</Text>;
                   if (!sc?.css?.trim()) return <Text key={b.id} size="1" color="gray">– not synced to the site yet, nothing to check</Text>;
@@ -108,7 +108,7 @@ export default function ParityPanel({ manifest, brands, blocks, hub = './' }) {
                   );
                 })}
               </Box>
-            </Flex></Card>
+            </Card>
           );
         })}
       </Flex>
