@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   Flex, Text, Button, Badge, Card, TextField, Link, Callout,
 } from '@radix-ui/themes';
@@ -14,12 +14,14 @@ const stamp = () => new Date().toISOString().slice(0, 16).replace(/[-:T]/g, '');
  * Save draft, Generate preview, Publish. The draft branch and pull request are implementation details:
  * the branch name is generated once per session, so saving again simply updates the same draft.
  */
-export default function ApplyBar({ files, impact, brandId }) {
+export default function ApplyBar({ files, impact, brandId, onDraft }) {
   const paths = Object.keys(files);
   const key = JSON.stringify(files);
   const [token, setTok] = useState(getToken());
   const [branch] = useState(() => `design-update-${stamp()}`);
   const [s, setS] = useState({ stage: 'idle' });
+
+  useEffect(() => { onDraft?.(s.sha ? { sha: s.sha, dirty: s.savedKey !== key } : null); }, [s.sha, s.savedKey, key]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const dirty = s.savedKey !== key;
   const busy = ['saving', 'previewing', 'publishing', 'waiting', 'syncing', 'mergingSite'].includes(s.stage);

@@ -5,6 +5,13 @@ import {
 } from '@radix-ui/themes';
 import { Field, Pick, Text1 } from './ui.jsx';
 import { varsIn } from './ds.js';
+import { sitePreviewUrl } from './github.js';
+
+const DEFAULT_SITE = 'https://main--ew-radix-brands--ynaka-adobe.aem.page/';
+
+function SiteFrame({ url, title }) {
+  return <iframe key={url} src={url} title={title} style={{ width: '100%', height: 640, border: '1px solid var(--gray-5)', borderRadius: 'var(--radius-3)', background: 'white' }} />;
+}
 
 const ACCENTS = ['gold', 'bronze', 'brown', 'red', 'crimson', 'ruby', 'tomato', 'orange', 'amber', 'yellow', 'lime', 'grass', 'green', 'jade', 'mint', 'teal', 'cyan', 'sky', 'blue', 'indigo', 'iris', 'violet', 'purple', 'plum', 'pink'];
 const GRAYS = ['gray', 'mauve', 'slate', 'sage', 'olive', 'sand'];
@@ -95,7 +102,10 @@ function NewToken({ manifest, setManifest, blocks, setBlocks }) {
   );
 }
 
-export default function BrandsPanel({ manifest, setManifest, brands, setBrands, blocks, setBlocks, current, setCurrent, compare, setCompare }) {
+export default function BrandsPanel({ manifest, setManifest, brands, setBrands, blocks, setBlocks, current, setCurrent, compare, setCompare, draft }) {
+  const [site, setSite] = useState(DEFAULT_SITE);
+  const [path, setPath] = useState('/');
+  const [mock, setMock] = useState(false);
   const [copied, setCopied] = useState(false);
   const brand = brands[current];
   const other = manifest.brands.find((b) => b.id !== current)?.id;
@@ -157,9 +167,21 @@ export default function BrandsPanel({ manifest, setManifest, brands, setBrands, 
 
       <Box p="4" style={{ flex: 1, minWidth: 0, paddingBottom: 160 }}>
         <Flex direction="column" gap="4">
+          <Card size="2">
+            <Flex direction="column" gap="2">
+              <Flex gap="3" wrap="wrap" align="end">
+                <Box style={{ flex: 2, minWidth: 220 }}><Text1 label="Site URL" value={site} onChange={setSite} /></Box>
+                <Box style={{ flex: 1, minWidth: 120 }}><Text1 label="Page path" value={path} onChange={setPath} placeholder="/" /></Box>
+                <Flex align="center" gap="2" pb="2"><Switch checked={mock} onCheckedChange={setMock} /><Text size="2">Mock preview</Text></Flex>
+              </Flex>
+              <Text size="1" color="gray">
+                {mock ? 'Showing the built-in mock. Edits show live.' : `Showing the real site page. Edits appear after Save draft${draft ? (draft.dirty ? ' (unsaved changes are not shown yet).' : ' (showing the saved draft).') : '.'} If the page stays blank, switch to Mock preview.`}
+              </Text>
+            </Flex>
+          </Card>
           <Grid columns={compare && other ? { initial: '1', lg: '2' } : '1'} gap="4">
-            <Preview brand={previewBrand(brand)} />
-            {compare && other && <Preview brand={previewBrand(brands[other])} />}
+            {mock ? <Preview brand={previewBrand(brand)} /> : <SiteFrame title={current} url={sitePreviewUrl(site, path, current, draft?.sha)} />}
+            {compare && other && (mock ? <Preview brand={previewBrand(brands[other])} /> : <SiteFrame title={other} url={sitePreviewUrl(site, path, other, draft?.sha)} />)}
           </Grid>
           <Card size="2">
             <Flex direction="column" gap="3">

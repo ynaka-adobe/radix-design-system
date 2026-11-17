@@ -23,6 +23,7 @@ export default function App() {
   const [blocks, setBlocks] = useState(null);
   const [current, setCurrent] = useState(null);
   const [compare, setCompare] = useState(false);
+  const [draft, setDraft] = useState(null);
   const [error, setError] = useState('');
 
   useEffect(() => {
@@ -66,7 +67,7 @@ export default function App() {
   if (error) return <Theme><Box p="6"><Text color="red">Could not load the design system: {error}</Text></Box></Theme>;
   if (!brands) return <Theme><Box p="6"><Text>Loading design system…</Text></Box></Theme>;
 
-  const shared = { manifest, setManifest, brands, setBrands, blocks, setBlocks, current, setCurrent, compare, setCompare };
+  const shared = { manifest, setManifest, brands, setBrands, blocks, setBlocks, current, setCurrent, compare, setCompare, draft };
   return (
     <Theme accentColor="indigo" grayColor="slate" radius="medium" hasBackground>
       <Flex direction="column" style={{ minHeight: '100vh' }}>
@@ -81,7 +82,7 @@ export default function App() {
           <Tabs.Content value="primitives"><BlocksPanel {...shared} tier="collection" editable /></Tabs.Content>
           <Tabs.Content value="components"><BlocksPanel {...shared} tier="core" editable={false} /></Tabs.Content>
         </Tabs.Root>
-        <ApplyBar files={files} impact={impact} brandId={current} />
+        <ApplyBar files={files} impact={impact} brandId={current} onDraft={setDraft} />
       </Flex>
     </Theme>
   );

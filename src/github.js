@@ -79,6 +79,14 @@ export async function mergePullRequest({ token, number, branch }) {
 export const SITE_REPO = 'ynaka-adobe/ew-radix-brands';
 const HUB_URL = 'https://ynaka-adobe.github.io/radix-design-system/';
 
+/** URL of a site page showing a brand, optionally with a saved draft of the design system. */
+export function sitePreviewUrl(site, path, brand, draftSha) {
+  const u = new URL(path || '/', site);
+  u.searchParams.set('brand', brand);
+  if (draftSha) u.searchParams.set('ds', `https://raw.githubusercontent.com/${REPO}/${draftSha}/public/`);
+  return u.toString();
+}
+
 /** Wait until the published design system is newer than the moment of publishing. */
 export async function waitForHubDeploy(since, tries = 40) {
   for (let i = 0; i < tries; i += 1) {
