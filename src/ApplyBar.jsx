@@ -5,7 +5,7 @@ import {
 import {
   saveDraft, ensurePullRequest, waitForCommit, mergePullRequest, getToken, setToken, REPO,
   waitForHubDeploy, startSiteSync, waitForSitePullRequest, mergeSitePullRequest, SITE_REPO,
-  siteHost, waitForSiteBranch, deleteSiteBranch,
+  siteHost, waitForSiteBranch, deleteSiteBranch, ensureSiteBranch,
 } from './github.js';
 
 const stamp = () => new Date().toISOString().slice(0, 16).replace(/[-:T]/g, '');
@@ -49,13 +49,14 @@ export default function ApplyBar({ files, impact, brandId }) {
         .filter(([p]) => /^eds\/blocks\/[^/]+\/[^/]+\.(css|js)$/.test(p))
         .map(([p, c]) => [p.replace(/^eds\//, ''), c]));
       let host = siteHost('main'); let note = '';
-      if (Object.keys(siteFiles).length) {
-        try {
+      try {
+        // The preview always opens on the site branch with this draft's name: https://<branch>--<site>--<org>.aem.page/
+        if (Object.keys(siteFiles).length) {
           await saveDraft({ token, repo: SITE_REPO, branch, message: `Design update preview\n\n${paths.map((p) => `- ${p}`).join('\n')}`, files: siteFiles });
-          await waitForSiteBranch(branch, Object.keys(siteFiles)[0]);
-          host = siteHost(branch);
-        } catch (e) { note = `Branch preview unavailable (${e.message}). Showing the main site with the draft design system.`; }
-      }
+        } else await ensureSiteBranch(token, branch);
+        await waitForSiteBranch(branch, Object.keys(siteFiles)[0]);
+        host = siteHost(branch);
+      } catch (e) { note = `Branch preview unavailable (${e.message}). Showing the main site with the draft design system.`; }
       const ds = `https://raw.githubusercontent.com/${REPO}/${s.sha}/public/`;
       setS((x) => ({
         ...x, stage: 'ready', fallback: 'ready', pr: pr.number, prUrl: pr.url, note, siteBranch: host !== siteHost('main'), previewUrl: `${host}?ds=${encodeURIComponent(ds)}&brand=${brandId}`,

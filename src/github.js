@@ -115,13 +115,29 @@ export async function mergeSitePullRequest(token, number) {
 /** Edge Delivery serves every branch of the site at its own host: https://<branch>--<site>--<org>.aem.page/ */
 export const siteHost = (branch) => `https://${branch}--${SITE_REPO.split('/')[1]}--${owner}.aem.page/`;
 
-/** Wait until Code Sync has published the branch's block code. */
-export async function waitForSiteBranch(branch, file, tries = 30) {
+/** Make sure the site has a branch with this name (from main), so Edge Delivery serves it at its own host. */
+export async function ensureSiteBranch(token, branch) {
+  if (!/^[\w.-]+$/.test(branch)) throw new Error('Branch names use letters, numbers, dots, dashes and underscores only.');
+  try { await api(token, `git/ref/heads/${branch}`, {}, SITE_REPO); return; } catch (e) {
+    if (!String(e.message).startsWith('404')) throw e;
+  }
+  const main = (await api(token, 'git/ref/heads/main', {}, SITE_REPO)).object.sha;
+  await api(token, 'git/refs', { method: 'POST', body: JSON.stringify({ ref: `refs/heads/${branch}`, sha: main }) }, SITE_REPO);
+}
+
+/** Wait until Code Sync serves the branch. A stylesheet load works across origins, unlike fetch. */
+export async function waitForSiteBranch(branch, file = 'styles/styles.css', tries = 40) {
+  const probe = () => new Promise((resolve) => {
+    const link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.onload = () => { link.remove(); resolve(true); };
+    link.onerror = () => { link.remove(); resolve(false); };
+    link.media = 'print';
+    link.href = `${siteHost(branch)}${file}?t=${Date.now()}`;
+    document.head.append(link);
+  });
   for (let i = 0; i < tries; i += 1) {
-    try {
-      const r = await fetch(`${siteHost(branch)}${file}?t=${Date.now()}`, { cache: 'no-store' });
-      if (r.ok) return;
-    } catch (e) { /* retry */ }
+    if (await probe()) return;
     await new Promise((res) => { setTimeout(res, 3000); });
   }
   throw new Error('The site branch preview is not ready yet.');
