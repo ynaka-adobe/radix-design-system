@@ -23,7 +23,8 @@
     "accordion": "collection",
     "banner": "collection",
     "tabs": "collection",
-    "quote": "collection"
+    "quote": "collection",
+    "stats": "collection"
   },
   "tokens": {
     "--ds-accordion-divider": {
