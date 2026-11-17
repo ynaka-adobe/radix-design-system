@@ -21,7 +21,7 @@ function Preview({ brand }) {
   return (
     <Theme {...theme} hasBackground style={{ minHeight: 'auto', ...vars, borderRadius: 'var(--radius-4)' }}>
       <Box style={{ background: 'var(--gray-3)' }} py={layout.sectionSpace}>
-        <Container size={layout.containerSize}>
+        <Container size={layout.containerSize} px="5">
           <Flex direction="column" align="center" gap="4" style={{ textAlign: 'center' }}>
             <Heading size="8" style={heading}>Drive what moves you</Heading>
             <Text size="4" color="gray">One set of blocks. Every brand renders as itself.</Text>
@@ -30,7 +30,7 @@ function Preview({ brand }) {
         </Container>
       </Box>
       <Box py={layout.sectionSpace}>
-        <Container size={layout.containerSize}>
+        <Container size={layout.containerSize} px="5">
           <Grid columns={{ initial: '1', sm: '3' }} gap="4">
             {[['Hybrid', 'Efficiency without compromise.'], ['Safety', 'Standard on every trim.'], ['Service', 'Book in two taps.']].map(([h, p]) => (
               <Card key={h} size="3">
@@ -42,13 +42,13 @@ function Preview({ brand }) {
         </Container>
       </Box>
       <Box style={{ background: 'var(--gray-3)', borderLeft: '6px solid var(--accent-9)' }} py={layout.sectionSpace}>
-        <Container size={layout.containerSize}>
+        <Container size={layout.containerSize} px="5">
           <Heading size="6" mb="2" style={heading}>Find your fit</Heading>
           <Text color="gray">Compare trims side by side and see what changes between brands.</Text>
         </Container>
       </Box>
       <Box py="6">
-        <Container size={layout.containerSize}>
+        <Container size={layout.containerSize} px="5">
           <Flex gap="3" wrap="wrap">
             <Button size="3">Build yours</Button>
             <Button size="3" variant="outline">Find a dealer</Button>
