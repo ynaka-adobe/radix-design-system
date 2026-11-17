@@ -1,16 +1,9 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Box, Flex, Text, Badge, Card, Code } from '@radix-ui/themes';
-import { previewDoc, fieldOf } from './ds.js';
+import { previewDoc, fieldOf, siteRaw } from './ds.js';
 
 const get = (obj, path) => path.split('.').reduce((o, k) => o?.[k], obj);
 const text = async (u) => { try { const r = await fetch(u, { cache: 'no-cache' }); return r.ok ? r.text() : ''; } catch (e) { return ''; } };
-
-// https://<ref>--<repo>--<owner>.aem.page/ maps to the site repo on GitHub, which serves CORS-enabled raw files.
-export function siteRaw(site) {
-  const m = /^https?:\/\/([^.]+)\.aem\.(?:page|live)/.exec(site || '');
-  const [ref, repo, owner] = (m?.[1] || '').split('--');
-  return owner && repo ? `https://raw.githubusercontent.com/${owner}/${repo}/${ref || 'main'}/` : '';
-}
 
 const frame = { width: '100%', height: 300, border: '1px solid var(--gray-6)', borderRadius: 'var(--radius-3)', background: '#fff' };
 

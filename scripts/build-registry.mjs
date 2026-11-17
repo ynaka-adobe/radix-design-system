@@ -85,6 +85,11 @@ if (PREVIOUS) {
   }
 }
 
+// --- the sample page: plain EDS content, one section per block, to paste into DA at /ds-sample ---
+const sampleOf = (n) => (existsSync(join(SRC, n, 'sample.html')) ? readFileSync(join(SRC, n, 'sample.html'), 'utf8').trim() : '');
+const sampleBlocks = [...blocks].filter((b) => sampleOf(b.name)).sort((a, b) => (a.tier === 'core' ? 0 : 1) - (b.tier === 'core' ? 0 : 1) || a.name.localeCompare(b.name));
+writeFileSync(join(PUB, 'ds-sample.html'), `<body>\n  <header></header>\n  <main>\n${sampleBlocks.map((b) => `    <div>\n      ${sampleOf(b.name)}\n    </div>`).join('\n')}\n  </main>\n  <footer></footer>\n</body>\n`);
+
 writeFileSync(join(PUB, 'registry.json'), `${JSON.stringify(registry, null, 2)}\n`);
 writeFileSync(join(PUB, 'changes.json'), `${JSON.stringify(changes, null, 2)}\n`);
 console.log(`registry v${registry.version}: ${blocks.length} blocks; changes since ${changes.from || 'n/a'}: ${changes.tokenChanges.length} token, ${changes.blockChanges.length} block`);
