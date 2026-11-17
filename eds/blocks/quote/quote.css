@@ -1,0 +1,5 @@
+.quote { max-width: var(--ds-container, 880px); margin: 0 auto; padding: var(--ds-section-space, var(--space-8)) var(--space-5); box-sizing: content-box; }
+.quote blockquote { margin: 0; padding-left: var(--space-5); border-left: var(--space-1) solid var(--accent-9); }
+.quote blockquote p { margin: 0 0 var(--space-3); color: var(--gray-12); font-family: var(--ds-heading-font, inherit); font-size: var(--font-size-6); line-height: var(--line-height-6); }
+.quote cite { display: block; color: var(--gray-11); font-size: var(--font-size-3); font-style: normal; }
+.quote cite::before { content: '\2014\00a0'; }
