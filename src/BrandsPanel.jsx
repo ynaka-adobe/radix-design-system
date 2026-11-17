@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import {
   Theme, Flex, Box, Grid, Heading, Text, Button, Card, Container,
   Separator, Badge, Code, Callout, Switch,
@@ -8,8 +8,13 @@ import { varsIn } from './ds.js';
 import { sitePreviewUrl } from './github.js';
 
 
-function SiteFrame({ url, title }) {
-  return <iframe key={url} src={url} title={title} style={{ width: '100%', height: 640, border: '1px solid var(--gray-5)', borderRadius: 'var(--radius-3)', background: 'white' }} />;
+function SiteFrame({ url, title, brand }) {
+  const ref = useRef(null);
+  const post = () => {
+    try { ref.current?.contentWindow?.postMessage({ type: 'ds-brand-preview', brand }, new URL(url).origin); } catch (e) { /* not ready */ }
+  };
+  useEffect(post, [brand, url]);
+  return <iframe ref={ref} onLoad={post} key={url} src={url} title={title} style={{ width: '100%', height: 640, border: '1px solid var(--gray-5)', borderRadius: 'var(--radius-3)', background: 'white' }} />;
 }
 
 const ACCENTS = ['gold', 'bronze', 'brown', 'red', 'crimson', 'ruby', 'tomato', 'orange', 'amber', 'yellow', 'lime', 'grass', 'green', 'jade', 'mint', 'teal', 'cyan', 'sky', 'blue', 'indigo', 'iris', 'violet', 'purple', 'plum', 'pink'];
@@ -103,7 +108,7 @@ function NewToken({ manifest, setManifest, blocks, setBlocks }) {
 
 export default function BrandsPanel({ manifest, setManifest, brands, setBrands, blocks, setBlocks, current, setCurrent, compare, setCompare, draft, site, setSite }) {
   const [path, setPath] = useState('/');
-  const [mock, setMock] = useState(false);
+  const [mock, setMock] = useState(true);
   const [copied, setCopied] = useState(false);
   const brand = brands[current];
   const other = manifest.brands.find((b) => b.id !== current)?.id;
@@ -170,16 +175,16 @@ export default function BrandsPanel({ manifest, setManifest, brands, setBrands, 
               <Flex gap="3" wrap="wrap" align="end">
                 <Box style={{ flex: 2, minWidth: 220 }}><Text1 label="Site URL" value={site} onChange={setSite} /></Box>
                 <Box style={{ flex: 1, minWidth: 120 }}><Text1 label="Page path" value={path} onChange={setPath} placeholder="/" /></Box>
-                <Flex align="center" gap="2" pb="2"><Switch checked={mock} onCheckedChange={setMock} /><Text size="2">Mock preview</Text></Flex>
+                <Flex align="center" gap="2" pb="2"><Text size="2">Live preview</Text><Switch checked={!mock} onCheckedChange={(v) => setMock(!v)} /><Text size="2">Site page</Text></Flex>
               </Flex>
               <Text size="1" color="gray">
-                {mock ? 'Showing the built-in mock. Edits show live.' : `Showing the real site page. Edits appear after Save draft${draft ? (draft.dirty ? ' (unsaved changes are not shown yet).' : ' (showing the saved draft).') : '.'} If the page stays blank, switch to Mock preview.`}
+                {mock ? 'Live preview updates instantly on every edit.' : `Shows saved drafts; press Save draft to refresh${draft?.dirty ? ' (you have unsaved changes).' : '.'} The page reloads when a new draft is saved. If it stays blank, switch to Live preview.`}
               </Text>
             </Flex>
           </Card>
           <Grid columns={compare && other ? { initial: '1', lg: '2' } : '1'} gap="4">
-            {mock ? <Preview brand={previewBrand(brand)} /> : <SiteFrame title={current} url={sitePreviewUrl(site, path, current, draft?.sha)} />}
-            {compare && other && (mock ? <Preview brand={previewBrand(brands[other])} /> : <SiteFrame title={other} url={sitePreviewUrl(site, path, other, draft?.sha)} />)}
+            {mock ? <Preview brand={previewBrand(brand)} /> : <SiteFrame brand={brand} title={current} url={sitePreviewUrl(site, path, current, draft?.sha)} />}
+            {compare && other && (mock ? <Preview brand={previewBrand(brands[other])} /> : <SiteFrame brand={brands[other]} title={other} url={sitePreviewUrl(site, path, other, draft?.sha)} />)}
           </Grid>
           <Card size="2">
             <Flex direction="column" gap="3">
