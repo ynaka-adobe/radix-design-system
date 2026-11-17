@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { Theme, Flex, Box, Heading, Text, Tabs } from '@radix-ui/themes';
 import BrandsPanel from './BrandsPanel.jsx';
 import BlocksPanel from './BlocksPanel.jsx';
+import ParityPanel from './ParityPanel.jsx';
 import ApplyBar from './ApplyBar.jsx';
 import { loadDs, fieldsIn, flat } from './ds.js';
 
@@ -75,10 +76,12 @@ export default function App({ hub = './' }) {
         <Tabs.Root defaultValue="brands" style={{ flex: 1 }}>
           <Box px="4"><Tabs.List>
             <Tabs.Trigger value="brands">Brands and tokens</Tabs.Trigger>
+            <Tabs.Trigger value="parity">Parity</Tabs.Trigger>
             <Tabs.Trigger value="primitives">Primitives and block collection</Tabs.Trigger>
             <Tabs.Trigger value="components">Components (boilerplate)</Tabs.Trigger>
           </Tabs.List></Box>
           <Tabs.Content value="brands"><BrandsPanel {...shared} /></Tabs.Content>
+          <Tabs.Content value="parity"><ParityPanel {...shared} hub={hub} /></Tabs.Content>
           <Tabs.Content value="primitives"><BlocksPanel {...shared} tier="collection" editable /></Tabs.Content>
           <Tabs.Content value="components"><BlocksPanel {...shared} tier="core" editable={false} /></Tabs.Content>
         </Tabs.Root>
