@@ -22,7 +22,8 @@
     "button": "core",
     "accordion": "collection",
     "banner": "collection",
-    "tabs": "collection"
+    "tabs": "collection",
+    "quote": "collection"
   },
   "tokens": {
     "--ds-accordion-divider": {

@@ -1,0 +1,6 @@
+{
+  "title": "Quote",
+  "status": "stable",
+  "description": "A customer quote with an attribution.",
+  "authoring": "One row, one cell: the quote as a paragraph, then the attribution as a second paragraph."
+}
