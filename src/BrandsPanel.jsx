@@ -7,7 +7,6 @@ import { Field, Pick, Text1 } from './ui.jsx';
 import { varsIn } from './ds.js';
 import { sitePreviewUrl } from './github.js';
 
-const DEFAULT_SITE = 'https://main--ew-radix-brands--ynaka-adobe.aem.page/';
 
 function SiteFrame({ url, title }) {
   return <iframe key={url} src={url} title={title} style={{ width: '100%', height: 640, border: '1px solid var(--gray-5)', borderRadius: 'var(--radius-3)', background: 'white' }} />;
@@ -102,8 +101,7 @@ function NewToken({ manifest, setManifest, blocks, setBlocks }) {
   );
 }
 
-export default function BrandsPanel({ manifest, setManifest, brands, setBrands, blocks, setBlocks, current, setCurrent, compare, setCompare, draft }) {
-  const [site, setSite] = useState(DEFAULT_SITE);
+export default function BrandsPanel({ manifest, setManifest, brands, setBrands, blocks, setBlocks, current, setCurrent, compare, setCompare, draft, site, setSite }) {
   const [path, setPath] = useState('/');
   const [mock, setMock] = useState(false);
   const [copied, setCopied] = useState(false);
