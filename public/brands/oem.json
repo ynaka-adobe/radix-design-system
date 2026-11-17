@@ -1,7 +1,7 @@
 {
   "name": "OEM",
   "theme": {
-    "accentColor": "red",
+    "accentColor": "lime",
     "grayColor": "gray",
     "radius": "full",
     "scaling": "100%",
