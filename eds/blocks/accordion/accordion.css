@@ -1,4 +1,4 @@
-.accordion { max-width: var(--ds-container, 880px); margin: 0 auto; padding: var(--ds-section-space, var(--space-8)) var(--space-5); box-sizing: content-box; }
+.accordion { max-width: var(--ds-container, 820px); margin: 0 auto; padding: var(--ds-section-space, var(--space-8)) var(--space-5); box-sizing: content-box; }
 .accordion .accordion-item { border-bottom: var(--ds-accordion-divider, 1px) solid var(--gray-6); }
 .accordion .accordion-trigger { display: flex; justify-content: space-between; align-items: center; gap: var(--space-4); cursor: pointer; list-style: none; padding: var(--space-4) 0; color: var(--gray-12); font-size: var(--font-size-4); font-weight: var(--ds-heading-weight, 600); }
 .accordion .accordion-trigger::-webkit-details-marker { display: none; }
