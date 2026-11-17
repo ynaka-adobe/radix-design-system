@@ -1,6 +1,6 @@
 // Creates a git branch with a commit, from the browser, through the GitHub API.
 // The token is the user's own (fine-grained, Contents: read and write on this repo). Kept in this tab only.
-export const REPO = 'ynaka-adobe/radix-design-system';
+export let REPO = 'ynaka-adobe/radix-design-system';
 
 export const getToken = () => { try { return sessionStorage.getItem('ds-github-token') || ''; } catch (e) { return ''; } };
 export const setToken = (t) => { try { sessionStorage.setItem('ds-github-token', t); } catch (e) { /* storage unavailable */ } };
@@ -48,7 +48,7 @@ export async function saveDraft({
   return { branch, updated, sha: commit.sha, compareUrl: `https://github.com/${repo}/compare/${base}...${branch}?expand=1` };
 }
 
-const owner = REPO.split('/')[0];
+let owner = REPO.split('/')[0];
 
 /** Open a pull request for the draft, or return the one that is already open. */
 export async function ensurePullRequest({ token, branch, title, body, base = 'main' }) {
@@ -77,7 +77,13 @@ export async function mergePullRequest({ token, number, branch }) {
 
 /** The Edge Delivery site that consumes this design system. */
 export const SITE_REPO = 'ynaka-adobe/ew-radix-brands';
-const HUB_URL = 'https://ynaka-adobe.github.io/radix-design-system/';
+let HUB_URL = 'https://ynaka-adobe.github.io/radix-design-system/';
+
+/** Point the app at a hub (used when it runs as an installed tool). */
+export function configureHub({ repo, pagesUrl }) {
+  if (repo) { REPO = repo; [owner] = repo.split('/'); }
+  if (pagesUrl) HUB_URL = pagesUrl.replace(/\/?$/, '/');
+}
 
 /** URL of a site page showing a brand, optionally with a saved draft of the design system. */
 export function sitePreviewUrl(site, path, brand, draftSha) {

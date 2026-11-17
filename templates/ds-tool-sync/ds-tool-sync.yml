@@ -1,0 +1,30 @@
+name: Design system tool sync
+# Opens a pull request when a new Radix Designer release is listed on the hub.
+on:
+  schedule:
+    - cron: '41 * * * *'
+  workflow_dispatch:
+  repository_dispatch:
+    types: [design-system-tool-release]
+permissions:
+  contents: write
+  pull-requests: write
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: node scripts/ds-tool-sync.mjs
+      - uses: peter-evans/create-pull-request@v6
+        with:
+          branch: design-system-tool
+          delete-branch: true
+          add-paths: |
+            tools/radix-designer/**
+            tools.lock.json
+          commit-message: 'Update Radix Designer tool'
+          title: 'Update Radix Designer tool'
+          body-path: ds-tool-sync-summary.md

@@ -16,7 +16,7 @@ function blockFiles(b) {
   return out;
 }
 
-export default function App() {
+export default function App({ hub = './' }) {
   const [orig, setOrig] = useState(null);
   const [manifest, setManifest] = useState(null);
   const [brands, setBrands] = useState(null);
@@ -27,7 +27,7 @@ export default function App() {
   const [error, setError] = useState('');
 
   useEffect(() => {
-    loadDs().then((ds) => {
+    loadDs(hub).then((ds) => {
       setOrig({
         manifest: pretty(ds.manifest),
         brands: JSON.parse(JSON.stringify(ds.brands)),

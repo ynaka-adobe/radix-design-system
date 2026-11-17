@@ -36,6 +36,15 @@ The hub owns the EDS blocks too, just as it owns React components.
 ## Publish
 In the GitHub repo settings, set Pages to deploy from **GitHub Actions** once. The workflow in `.github/workflows/pages.yml` does the rest.
 
+## Radix Designer as an installable EDS tool
+The hub UI can also run inside an Edge Delivery site repo at `tools/radix-designer/radix-designer.html`. It reads `hub.json` next to it (`{ "repo", "pagesUrl" }`) and loads `manifest.json`, `brands/*.json` and `registry.json` from that hub at runtime, so the hub stays the source of truth.
+
+- `npm run build:tool` builds the bundle into `dist-tool/` (relative paths, hashed assets, `tool.json`, default `hub.json`).
+- **Release:** bump `version` in `package.json`, then push a tag `v<version>`. `.github/workflows/release-tool.yml` builds the bundle, publishes `radix-designer-<version>.zip` as a GitHub Release, and lists the version with its sha256 in `public/tools.json`, which Pages serves next to `manifest.json`.
+- **Install in a site repo (once):** copy `templates/ds-tool-sync/ds-tool-sync.mjs` to `scripts/`, `ds-tool-sync.yml` to `.github/workflows/`, and `tools.lock.json` to the repo root (edit `hub` and `repo` if needed). Run the "Design system tool sync" workflow. It opens a pull request on branch `design-system-tool` with `tools/radix-designer/` and the updated lockfile (version and sha256). Merge it, then open `/tools/radix-designer/radix-designer.html` on the site.
+- **Update:** the workflow runs hourly and opens a new pull request when `tools.json` lists a newer version. The download is checked against the listed sha256. Set `"pin": "<version>"` in `tools.lock.json` to hold at a version.
+
+
 Not affiliated with or endorsed by Radix or WorkOS.
 
 ## Panels and roles

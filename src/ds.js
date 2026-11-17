@@ -1,8 +1,9 @@
 // Shared helpers: load the design system, compute what a block depends on, render a brand-aware block preview.
 export const CONTAINERS = { 1: '448px', 2: '688px', 3: '880px', 4: '1136px' };
-const get = async (u) => { const r = await fetch(u, { cache: 'no-cache' }); return r.ok ? r.text() : ''; };
+const getText = async (u) => { const r = await fetch(u, { cache: 'no-cache' }); return r.ok ? r.text() : ''; };
 
-export async function loadDs() {
+export async function loadDs(base = './') {
+  const get = (p) => getText(`${base}${p.replace(/^\.\//, '')}`);
   const manifest = JSON.parse(await get('./manifest.json'));
   const brands = {};
   await Promise.all(manifest.brands.map(async (b) => { brands[b.id] = JSON.parse(await get(`./${b.file}`)); }));

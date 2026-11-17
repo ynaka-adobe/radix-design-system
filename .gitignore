@@ -5,3 +5,4 @@ dist
 public/registry.json
 public/changes.json
 public/eds
+dist-tool
