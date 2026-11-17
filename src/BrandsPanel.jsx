@@ -118,7 +118,7 @@ export default function BrandsPanel({ manifest, setManifest, brands, setBrands, 
     <Flex direction={{ initial: 'column', md: 'row' }} align="stretch">
       <Box p="4" width={{ initial: '100%', md: '360px' }} flexShrink="0" style={{ borderRight: '1px solid var(--gray-5)', borderBottom: '1px solid var(--gray-5)' }}>
         <Flex direction="column" gap="3">
-          <Text size="2" color="gray">Edit a brand and preview it with real Radix Themes components. Changes are applied to a git branch from the bar at the bottom.</Text>
+          <Text size="2" color="gray">Edit a brand and preview it with real Radix Themes components. Save a draft from the bar at the bottom, preview it, then publish.</Text>
           <Pick label="Brand" value={current} options={manifest.brands.map((b) => b.id)} onChange={setCurrent} />
           <Flex align="center" gap="2"><Switch checked={compare} onCheckedChange={setCompare} /><Text size="2">Compare with {other}</Text></Flex>
           <Separator size="4" />
@@ -168,7 +168,7 @@ export default function BrandsPanel({ manifest, setManifest, brands, setBrands, 
                 <Button onClick={copy} variant="soft">{copied ? 'Copied' : 'Copy JSON'}</Button>
               </Flex>
               <Callout.Root size="1" color="gray">
-                <Callout.Text>Use <b>Apply</b> in the bar below to put this on a git branch. Copy JSON is for editing the file by hand.</Callout.Text>
+                <Callout.Text>Use <b>Save draft</b> in the bar below. Copy JSON is for editing the file by hand.</Callout.Text>
               </Callout.Root>
               <pre style={{ margin: 0, overflow: 'auto', fontSize: 12 }}><code>{json}</code></pre>
             </Flex>

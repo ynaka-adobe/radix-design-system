@@ -151,7 +151,7 @@ export default function BlocksPanel({
             </Tabs.Root>
             {editable && (
               <Callout.Root size="1" color="gray"><Callout.Text>
-                Saved as <code>eds/blocks/{name}/</code>: <code>{name}.css</code> (style.css), <code>{name}.js</code> (EDS), <code>index.jsx</code>, <code>sample.html</code> and <code>spec.json</code>. Use Apply in the bar below to create the branch.
+                Saved as <code>eds/blocks/{name}/</code>: <code>{name}.css</code> (style.css), <code>{name}.js</code> (EDS), <code>index.jsx</code>, <code>sample.html</code> and <code>spec.json</code>. Use Save draft in the bar below.
               </Callout.Text></Callout.Root>
             )}
           </Flex>
