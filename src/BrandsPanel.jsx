@@ -116,7 +116,7 @@ export default function BrandsPanel({ manifest, setManifest, brands, setBrands, 
 
   return (
     <Flex direction={{ initial: 'column', md: 'row' }} align="stretch">
-      <Box p="4" width={{ initial: '100%', md: '360px' }} flexShrink="0" style={{ borderRight: '1px solid var(--gray-5)', borderBottom: '1px solid var(--gray-5)' }}>
+      <Box p="4" width={{ initial: '100%', md: '360px' }} flexShrink="0" className="brands-sidebar" style={{ borderRight: '1px solid var(--gray-5)', borderBottom: '1px solid var(--gray-5)', boxSizing: 'border-box', minWidth: 0 }}>
         <Flex direction="column" gap="3">
           <Text size="2" color="gray">Edit a brand and preview it with real Radix Themes components. Save a draft from the bar at the bottom, preview it, then publish.</Text>
           <Pick label="Brand" value={current} options={manifest.brands.map((b) => b.id)} onChange={setCurrent} />
@@ -155,7 +155,7 @@ export default function BrandsPanel({ manifest, setManifest, brands, setBrands, 
         </Flex>
       </Box>
 
-      <Box p="4" style={{ flex: 1, minWidth: 0 }}>
+      <Box p="4" style={{ flex: 1, minWidth: 0, paddingBottom: 160 }}>
         <Flex direction="column" gap="4">
           <Grid columns={compare && other ? { initial: '1', lg: '2' } : '1'} gap="4">
             <Preview brand={previewBrand(brand)} />

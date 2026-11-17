@@ -1,0 +1,11 @@
+@media (min-width: 768px) {
+  .brands-sidebar {
+    position: sticky;
+    top: 0;
+    align-self: flex-start;
+    max-height: calc(100vh - 140px);
+    overflow-y: auto;
+  }
+}
+.brands-sidebar * { min-width: 0; box-sizing: border-box; }
+.brands-sidebar .rt-SelectTrigger { width: 100%; }
