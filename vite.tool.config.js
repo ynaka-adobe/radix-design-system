@@ -17,7 +17,8 @@ const toolFiles = () => ({
 
 export default defineConfig({
   base: './',
-  plugins: [react(), toolFiles()],
+  define: { __BUILD__: JSON.stringify(`v${pkg.version} · ${(process.env.GITHUB_SHA || 'local').slice(0, 7)}`) },
+    plugins: [react(), toolFiles()],
   publicDir: false,
   build: { outDir: 'dist-tool', emptyOutDir: true, rollupOptions: { input: 'radix-designer.html' } },
 });

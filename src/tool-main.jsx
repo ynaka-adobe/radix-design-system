@@ -9,7 +9,7 @@ import { configureHub } from './github.js';
 // Installed-tool entry. hub.json sits next to radix-designer.html:
 // { "repo": "owner/radix-design-system", "pagesUrl": "https://owner.github.io/radix-design-system/" }
 const root = createRoot(document.getElementById('root'));
-fetch('./hub.json', { cache: 'no-cache' })
+fetch(`./hub.json?t=${Date.now()}`, { cache: 'no-store' })
   .then((r) => { if (!r.ok) throw new Error(`hub.json: ${r.status}`); return r.json(); })
   .then((cfg) => {
     if (!cfg.pagesUrl) throw new Error('hub.json needs "pagesUrl"');

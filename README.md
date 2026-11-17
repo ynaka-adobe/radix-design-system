@@ -37,7 +37,7 @@ The hub owns the EDS blocks too, just as it owns React components.
 In the GitHub repo settings, set Pages to deploy from **GitHub Actions** once. The workflow in `.github/workflows/pages.yml` does the rest.
 
 ## Parity tab
-Rows are every block in the hub (first column: the block name and tier). There is one column per brand in `manifest.json`, and each cell is a visual render of the block using the real EDS block code of the site `https://main--ew-radix-brands--ynaka-adobe.aem.page/` (a constant in `src/ParityPanel.jsx`) with that brand's tokens, plus the parity check (missing brand fields, hardcoded colours). Each row also shows whether the site's block hash matches the registry. The site sends no CORS headers, so its block code is read from the site repo on GitHub (main).
+Rows are every block in the hub (first column: the block name and tier). There is one column per brand in `manifest.json`, and each cell is a ✓/✗ text check against the real EDS block code of the site `https://main--ew-radix-brands--ynaka-adobe.aem.page/` (a constant in `src/ParityPanel.jsx`) (missing brand fields, hardcoded colours). Each row also shows whether the site's block hash matches the registry. The site sends no CORS headers, so its block code is read from the site repo on GitHub (main).
 
 ## Manual apply workflow (no token in the browser)
 `.github/workflows/apply.yml` runs the privileged steps in GitHub Actions. It is started by hand, never from the browser: Actions tab > **Apply design update** > Run workflow, or the `gh` commands the Apply bar shows after Save draft. It uses `GITHUB_TOKEN` for this repo and the repository secret `SITE_REPO_TOKEN` for `ynaka-adobe/ew-radix-brands`.

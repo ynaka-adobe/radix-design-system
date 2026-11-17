@@ -1,6 +1,6 @@
 // Shared helpers: load the design system, compute what a block depends on, render a brand-aware block preview.
 export const CONTAINERS = { 1: '448px', 2: '688px', 3: '880px', 4: '1136px' };
-const getText = async (u) => { const r = await fetch(u, { cache: 'no-cache' }); return r.ok ? r.text() : ''; };
+const getText = async (u) => { const r = await fetch(`${u}${u.includes('?') ? '&' : '?'}t=${Date.now()}`, { cache: 'no-store' }); return r.ok ? r.text() : ''; };
 
 export async function loadDs(base = './') {
   const get = (p) => getText(`${base}${p.replace(/^\.\//, '')}`);

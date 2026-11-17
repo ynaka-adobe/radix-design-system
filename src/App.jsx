@@ -76,15 +76,16 @@ export default function App({ hub = './' }) {
         <Tabs.Root defaultValue={window.location.hash === '#parity' ? 'parity' : 'brands'} style={{ flex: 1 }}>
           <Box px="4"><Tabs.List>
             <Tabs.Trigger value="brands">Brands and tokens</Tabs.Trigger>
-            <Tabs.Trigger value="parity">Parity</Tabs.Trigger>
             <Tabs.Trigger value="primitives">Primitives and block collection</Tabs.Trigger>
             <Tabs.Trigger value="components">Components (boilerplate)</Tabs.Trigger>
+            <Tabs.Trigger value="parity">Parity</Tabs.Trigger>
           </Tabs.List></Box>
           <Tabs.Content value="brands"><BrandsPanel {...shared} /></Tabs.Content>
-          <Tabs.Content value="parity"><ParityPanel {...shared} hub={hub} /></Tabs.Content>
           <Tabs.Content value="primitives"><BlocksPanel {...shared} tier="collection" editable /></Tabs.Content>
           <Tabs.Content value="components"><BlocksPanel {...shared} tier="core" editable={false} /></Tabs.Content>
+          <Tabs.Content value="parity"><ParityPanel {...shared} hub={hub} /></Tabs.Content>
         </Tabs.Root>
+        <Box px="4" pb="2"><Text size="1" color="gray">Build {__BUILD__}</Text></Box>
         <ApplyBar files={files} impact={impact} brandId={current} onDraft={setDraft} />
       </Flex>
     </Theme>
