@@ -1,0 +1,6 @@
+.carousel {
+  padding: var(--ds-section-space, var(--space-8)) var(--space-5);
+  max-width: var(--ds-container, 880px);
+  margin: 0 auto;
+  color: var(--gray-12);
+}

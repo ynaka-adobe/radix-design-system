@@ -24,7 +24,8 @@
     "banner": "collection",
     "tabs": "collection",
     "quote": "collection",
-    "stats": "collection"
+    "stats": "collection",
+    "carousel": "collection"
   },
   "tokens": {
     "--ds-accordion-divider": {
